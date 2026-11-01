@@ -1,0 +1,210 @@
+Use one shared Git remote for both machines, then use SSH/SFTP for the VM and FileZilla to verify the final files.
+
+Best practice:
+- Host = source machine
+- VM = test/deploy machine
+- Shared repo = GitHub/GitLab or a bare Git repo on the host
+- Git handles synchronization
+- FileZilla validates the actual files on the VM
+
+1) Install required tools on Ubuntu
+On both the host and VM:
+
+```bash
+sudo apt update
+sudo apt install -y git openssh-client filezilla
+```
+
+2) Set up SSH access from host to VM
+On host:
+
+```bash
+ssh-keygen -t ed25519 -C "host-to-vm"
+cat ~/.ssh/id_ed25519.pub
+```
+
+Copy the public key to the VM:
+
+```bash
+ssh-copy-id user@VM_IP
+```
+
+Test:
+
+```bash
+ssh user@VM_IP
+```
+
+3) Option A: Shared repository via GitHub/GitLab (recommended)
+This is the cleanest way.
+
+On host:
+```bash
+mkdir -p ~/projects
+cd ~/projects
+git clone git@github.com:YOUR_USER/YOUR_REPO.git
+cd YOUR_REPO
+git checkout -b dev
+```
+
+On VM:
+```bash
+ssh user@VM_IP
+mkdir -p ~/projects
+cd ~/projects
+git clone git@github.com:YOUR_USER/YOUR_REPO.git
+cd YOUR_REPO
+git checkout -b dev
+```
+
+Now both machines use the same remote repo. Sync changes like this:
+
+Host:
+```bash
+cd ~/projects/YOUR_REPO
+# edit files
+git status
+git add .
+git commit -m "update from host"
+git push origin dev
+```
+
+VM:
+```bash
+cd ~/projects/YOUR_REPO
+git pull origin dev
+```
+
+To push from VM:
+```bash
+git add .
+git commit -m "update from VM"
+git push origin dev
+```
+
+4) Option B: No external Git remote: use a bare repo on the host
+If you do not want GitHub/GitLab, create a bare repo on the host and use it as the central repository.
+
+On host:
+```bash
+mkdir -p ~/git-repos
+cd ~/git-repos
+git init --bare YOUR_REPO.git
+```
+
+Clone to host working copy:
+```bash
+mkdir -p ~/projects
+cd ~/projects
+git clone /home/YOUR_USER/git-repos/YOUR_REPO.git
+cd YOUR_REPO
+git config user.name "Your Name"
+git config user.email "you@example.com"
+echo "# My Project" > README.md
+git add README.md
+git commit -m "Initial commit"
+git push origin master
+```
+
+Clone the same repo on the VM from the host over SSH:
+```bash
+ssh user@VM_IP
+mkdir -p ~/projects
+cd ~/projects
+git clone ssh://user@HOST_IP/home/YOUR_USER/git-repos/YOUR_REPO.git
+cd YOUR_REPO
+```
+
+Then sync:
+```bash
+# On host
+cd ~/projects/YOUR_REPO
+# modify files
+git add .
+git commit -m "changes from host"
+git push origin master
+```
+
+```bash
+# On VM
+cd ~/projects/YOUR_REPO
+git pull origin master
+```
+
+5) Keep both machines in sync
+Typical workflow:
+
+Host:
+```bash
+cd ~/projects/YOUR_REPO
+git pull origin master
+# make changes
+git add .
+git commit -m "host changes"
+git push origin master
+```
+
+VM:
+```bash
+cd ~/projects/YOUR_REPO
+git pull origin master
+# make changes
+git add .
+git commit -m "vm changes"
+git push origin master
+```
+
+If you want to avoid conflicts:
+```bash
+git fetch origin
+git status
+git checkout main
+git pull origin main
+```
+
+6) Validate with FileZilla
+After syncing to the VM, connect to the VM using SFTP in FileZilla:
+
+- Host: VM_IP
+- Protocol: SFTP - SSH File Transfer Protocol
+- Logon Type: Normal
+- User: your_vm_user
+- Password: your_vm_password
+- Port: 22
+
+Then browse to the project directory, for example:
+```bash
+/home/your_user/projects/YOUR_REPO
+```
+
+Use FileZilla to:
+- Compare local and remote directory trees
+- Check that updated files exist
+- Confirm file timestamps changed
+- Verify no missing or stale files
+- Use “View > Directory Comparison” if needed
+
+7) Quick end-to-end example
+From host:
+```bash
+cd ~/projects/YOUR_REPO
+echo "update" >> notes.txt
+git add notes.txt
+git commit -m "update notes"
+git push origin master
+```
+
+From VM:
+```bash
+ssh user@VM_IP
+cd ~/projects/YOUR_REPO
+git pull origin master
+ls -l
+```
+
+Then in FileZilla, reconnect to the VM and verify the same files are present in the project folder.
+
+If you want, I can give you:
+- a step-by-step for GitHub-based sync,
+- a bare-repo setup for host + VM,
+- or a ready-to-run script for Ubuntu that does the pull/push automatically.
