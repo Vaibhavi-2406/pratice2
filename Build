@@ -1,0 +1,187 @@
+Here’s a clean Ubuntu terminal workflow to build and deploy a static website using GitHub and Vercel.
+
+1) Create the project
+Open a terminal and run:
+
+```bash
+mkdir my-static-site
+cd my-static-site
+```
+
+Create the website files:
+
+```bash
+cat > index.html <<'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Static Site</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <h1>My Brand</h1>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h2>Hello from Ubuntu + GitHub + Vercel</h2>
+      <p>This is a static website deployed with Vercel.</p>
+      <button onclick="showMessage()">Click me</button>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
+EOF
+
+cat > styles.css <<'EOF'
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f4f7fb;
+  color: #1f2937;
+}
+
+header {
+  background: #111827;
+  color: white;
+  padding: 1rem 2rem;
+}
+
+.hero {
+  max-width: 700px;
+  margin: 5rem auto;
+  text-align: center;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+EOF
+
+cat > script.js <<'EOF'
+function showMessage() {
+  alert('Static site is working!');
+}
+EOF
+```
+
+2) Initialize Git and push to GitHub
+If Git is not installed:
+
+```bash
+sudo apt update
+sudo apt install git -y
+```
+
+Now initialize the repo and commit:
+
+```bash
+git init
+git add .
+git commit -m "Initial static website"
+```
+
+Create a GitHub repo:
+If you have GitHub CLI installed:
+
+```bash
+gh auth login
+gh repo create my-static-site --public --source=. --remote=origin --push
+```
+
+If `gh` is not installed:
+
+```bash
+sudo apt install gh -y
+gh auth login
+gh repo create my-static-site --public --source=. --remote=origin --push
+```
+
+If you prefer GitHub web UI:
+- Create a repo on GitHub
+- Then connect it:
+
+```bash
+git remote add origin https://github.com/YOUR_USERNAME/my-static-site.git
+git branch -M main
+git push -u origin main
+```
+
+3) Deploy with Vercel
+Option A: Use Vercel web dashboard
+- Go to https://vercel.com
+- Sign in with GitHub
+- Click “Add New Project”
+- Import your GitHub repo
+- Keep default settings
+- Click Deploy
+
+For a plain static site, Vercel usually auto-detects it and works without a build step.
+
+Option B: Use Vercel CLI in Ubuntu terminal
+
+Install Vercel CLI:
+
+```bash
+npm install -g vercel
+```
+
+Then from your project folder:
+
+```bash
+vercel login
+vercel --prod
+```
+
+Follow the prompts:
+- Select your GitHub account
+- Choose the repo
+- Confirm project settings
+- Vercel will deploy it and give you a live URL
+
+4) Verify deployment
+After deployment, Vercel gives you a generated URL like:
+
+```text
+https://my-static-site-xxxxx.vercel.app
+```
+
+Open it in your browser. Your static site should load.
+
+5) Optional: Keep updating the site
+After making changes:
+
+```bash
+git add .
+git commit -m "Update website"
+git push origin main
+```
+
+Vercel will automatically redeploy the project when the GitHub repo updates.
+
+Notes
+- No backend is required for a static website.
+- Vercel is ideal for static HTML/CSS/JS projects.
+- If you want a more advanced website later, you can use Vite, Next.js, or React, but plain HTML/CSS/JS works perfectly for static hosting.
+
+If you want, I can also give you:
+- a version using Vite
+- a portfolio site template
+- a landing page template
+- a full command script you can paste directly into Ubuntu terminal
