@@ -1,0 +1,89 @@
+Use FTP from the Ubuntu VM to fetch the files, then initialize a Git repo and push it to GitHub.
+
+Best practice: use SFTP instead of plain FTP if possible, because FTP is insecure. But if you specifically need FTP, this works.
+
+1) Install the tools
+```bash
+sudo apt update
+sudo apt install -y ftp git
+```
+
+2) Connect to the remote FTP server from the Ubuntu VM
+Example:
+```bash
+ftp ftp.example.com
+```
+
+Then log in:
+```bash
+username
+password
+```
+
+Transfer files to the VM:
+```bash
+cd /path/on/ftp/server
+lcd /home/ubuntu/project
+mget *
+```
+
+If you want to upload files from the VM to the FTP server:
+```bash
+cd /path/on/ftp/server
+put /home/ubuntu/project/file.txt
+mput /home/ubuntu/project/*
+```
+
+Exit FTP:
+```bash
+bye
+```
+
+3) Go to the project folder and initialize Git
+```bash
+cd /home/ubuntu/project
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+```
+
+4) Create the GitHub repository
+On GitHub:
+- Click New repository
+- Name it
+- Do not initialize with README if you already have files
+- Create repository
+
+5) Connect the local repo to GitHub
+```bash
+git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
+git push -u origin main
+```
+
+If you used GitHub CLI instead:
+```bash
+gh auth login
+gh repo create YOUR_REPO --public --source=. --remote=origin --push
+```
+
+If you already initialized Git and want to add origin later:
+```bash
+git remote set-url origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
+git push -u origin main
+```
+
+If you want a more modern secure version, use SFTP instead of FTP:
+```bash
+sudo apt install -y openssh-client
+sftp username@ftp.example.com
+```
+
+Then:
+```bash
+cd /remote/path
+lcd /home/ubuntu/project
+get -r *
+```
+
+If you want, I can give you the exact command sequence for your specific FTP server details (host, username, password, remote folder, and GitHub repo URL).
