@@ -1,0 +1,251 @@
+Let's use 1 Router + 2 Switches + 4 PCs. This is a good, simple topology for your practical exam. I'll give you the complete steps from creating the topology to successful ping testing.
+
+# Experiment: Classless Subnetting in Cisco Packet Tracer
+
+## Step 1: Add devices
+
+Open Cisco Packet Tracer and add:
+
+| Device | Model     | Quantity |
+| ------ | --------- | -------- |
+| Router | 2911      | 1        |
+| Switch | 2960-24TT | 2        |
+| PC     | PC-PT     | 4        |
+
+## Step 2: Connect devices
+
+Select Connections (lightning icon) → Copper Straight-Through.
+
+Connect as follows:
+
+| From          | To           |
+| ------------- | ------------ |
+| Router0 G0/0  | Switch0 G0/1 |
+| Router0 G0/1  | Switch1 G0/1 |
+| Switch0 Fa0/1 | PC0 Fa0      |
+| Switch0 Fa0/2 | PC1 Fa0      |
+| Switch1 Fa0/1 | PC2 Fa0      |
+| Switch1 Fa0/2 | PC3 Fa0      |
+
+Your topology:
+
+Router0
+
+G0/0 ↓　　　　　　　　 G0/1 ↓
+
+Switch0
+
+PC0
+
+PC1
+
+Switch1
+
+PC2
+
+PC3
+
+## Step 3: Calculate classless subnetting
+
+Given network: `192.168.1.0/24`
+
+We need two LANs, each with two PCs and one router interface.
+
+Choose `/29`.
+
+- Network bits = 29
+- Host bits = 3
+- Total IP addresses = \\(2^3=8\\)
+- Usable IP addresses = 6
+- Subnet mask = `255.255.255.248`
+- Block size = 8
+
+### Subnetting table
+
+| LAN   | Network ID     | Usable range | Broadcast |
+| ----- | -------------- | ------------ | --------- |
+| LAN 1 | 192.168.1.0/29 | .1 – .6      | .7        |
+| LAN 2 | 192.168.1.8/29 | .9 – .14     | .15       |
+
+## Step 4: IP addressing table
+
+Use these exact addresses:
+
+| Device      | IP address   | Subnet mask     | Gateway     |
+| ----------- | ------------ | --------------- | ----------- |
+| Router G0/0 | 192.168.1.1  | 255.255.255.248 | —           |
+| PC0         | 192.168.1.2  | 255.255.255.248 | 192.168.1.1 |
+| PC1         | 192.168.1.3  | 255.255.255.248 | 192.168.1.1 |
+| Router G0/1 | 192.168.1.9  | 255.255.255.248 | —           |
+| PC2         | 192.168.1.10 | 255.255.255.248 | 192.168.1.9 |
+| PC3         | 192.168.1.11 | 255.255.255.248 | 192.168.1.9 |
+
+## Step 5: Configure Router0
+
+Click Router0 → CLI.
+
+Enter these commands:
+
+LAN 1 – Switch0
+
+```
+enable
+configure terminal
+
+interface gigabitEthernet 0/0
+ip address 192.168.1.1 255.255.255.248
+no shutdown
+exit
+```
+
+LAN 2 – Switch1
+
+```
+interface gigabitEthernet 0/1
+ip address 192.168.1.9 255.255.255.248
+no shutdown
+exit
+```
+
+Save configuration:
+
+```
+end
+write memory
+```
+
+Check interfaces:
+
+```
+show ip interface brief
+```
+
+Both interfaces must show `up/up`.
+
+## Step 6: Configure PC0
+
+Click PC0 → Desktop → IP Configuration → Static.
+
+Enter:
+
+```
+IP Address:      192.168.1.2
+Subnet Mask:     255.255.255.248
+Default Gateway: 192.168.1.1
+```
+
+## Step 7: Configure PC1
+
+Click PC1 → Desktop → IP Configuration → Static.
+
+```
+IP Address:      192.168.1.3
+Subnet Mask:     255.255.255.248
+Default Gateway: 192.168.1.1
+```
+
+## Step 8: Configure PC2
+
+Click PC2 → Desktop → IP Configuration → Static.
+
+```
+IP Address:      192.168.1.10
+Subnet Mask:     255.255.255.248
+Default Gateway: 192.168.1.9
+```
+
+## Step 9: Configure PC3
+
+Click PC3 → Desktop → IP Configuration → Static.
+
+```
+IP Address:      192.168.1.11
+Subnet Mask:     255.255.255.248
+Default Gateway: 192.168.1.9
+```
+
+## Step 10: Test connectivity
+
+Open PC0 → Desktop → Command Prompt.
+
+Run these commands one by one:
+
+Test PC0 to PC1
+
+```
+ping 192.168.1.3
+```
+
+Test PC0 to PC2
+
+```
+ping 192.168.1.10
+```
+
+Test PC0 to PC3
+
+```
+ping 192.168.1.11
+```
+
+Test PC2 to PC3
+
+```
+ping 192.168.1.11
+```
+
+Expected result:
+
+```
+Packets: Sent = 4
+Received = 4
+Lost = 0 (0% loss)
+```
+
+If the first ping fails, run it again after a few seconds.
+
+## Step 11: Verify routing table
+
+Router0 → CLI:
+
+```
+enable
+show ip route
+```
+
+You should see:
+
+```
+192.168.1.0/29
+192.168.1.8/29
+```
+
+These are directly connected networks, so no static routing is needed.
+
+## Step 12: Save your project
+
+Go to File → Save As.
+
+Filename:
+
+`Classless_Subnetting.pkt`
+
+## Step 13: Practical result
+
+The classless subnetting experiment was successfully implemented using one router, two switches and four PCs. The network `192.168.1.0/24` was divided into two `/29` subnets. Router interfaces and PC IP addresses were configured, and communication between both LANs was verified using the ping command.
+
+## Important viva questions
+
+| Question                 | Answer                                  |
+| ------------------------ | --------------------------------------- |
+| What is CIDR?            | Classless Inter-Domain Routing.         |
+| What is `/29`?           | 29 network bits and 3 host bits.        |
+| What is its subnet mask? | 255.255.255.248.                        |
+| How many usable hosts?   | 6.                                      |
+| What is a gateway?       | Router IP used to reach other networks. |
+| What is `no shutdown`?   | Activates the router interface.         |
+| What is ping?            | Tests network connectivity.             |
+
+Important: This is equal-sized CIDR subnetting, not VLSM. If your practical question specifically says VLSM, the subnet sizes must differ.
+
+My suggestion: Practise Steps 5–10 until you can configure the router and all four PCs without referring to the guide.
