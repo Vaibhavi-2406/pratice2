@@ -12,72 +12,67 @@ Create the website files:
 
 ```bash
 cat > index.html <<'EOF'
+```html
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Static Site</title>
-  <link rel="stylesheet" href="styles.css" />
+    <title>Registration Form</title>
 </head>
 <body>
-  <header>
-    <nav>
-      <h1>My Brand</h1>
-    </nav>
-  </header>
 
-  <main>
-    <section class="hero">
-      <h2>Hello from Ubuntu + GitHub + Vercel</h2>
-      <p>This is a static website deployed with Vercel.</p>
-      <button onclick="showMessage()">Click me</button>
-    </section>
-  </main>
+    <h1>Student Registration Form</h1>
 
-  <script src="script.js"></script>
+    <form>
+        <label>Full Name:</label>
+        <input type="text" name="name" placeholder="Enter your name">
+        <br><br>
+
+        <label>Email:</label>
+        <input type="email" name="email" placeholder="Enter your email">
+        <br><br>
+
+        <label>Password:</label>
+        <input type="password" name="password" placeholder="Enter password">
+        <br><br>
+
+        <label>Phone Number:</label>
+        <input type="tel" name="phone">
+        <br><br>
+
+        <label>Gender:</label>
+        <input type="radio" name="gender" value="Male"> Male
+        <input type="radio" name="gender" value="Female"> Female
+        <br><br>
+
+        <label>Date of Birth:</label>
+        <input type="date" name="dob">
+        <br><br>
+
+        <label>Course:</label>
+        <select name="course">
+            <option value="">Select Course</option>
+            <option value="BCA">BCA</option>
+            <option value="BBA">BBA</option>
+            <option value="BCOM">BCOM</option>
+        </select>
+        <br><br>
+
+        <label>Address:</label>
+        <textarea name="address" rows="4" cols="30"></textarea>
+        <br><br>
+
+        <input type="checkbox" name="terms">
+        I agree to the terms and conditions.
+        <br><br>
+
+        <input type="submit" value="Register">
+        <input type="reset" value="Clear">
+
+    </form>
+
 </body>
 </html>
-EOF
-
-cat > styles.css <<'EOF'
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  background: #f4f7fb;
-  color: #1f2937;
-}
-
-header {
-  background: #111827;
-  color: white;
-  padding: 1rem 2rem;
-}
-
-.hero {
-  max-width: 700px;
-  margin: 5rem auto;
-  text-align: center;
-  padding: 2rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-
-button {
-  background: #2563eb;
-  color: white;
-  border: none;
-  padding: 0.8rem 1.2rem;
-  border-radius: 8px;
-  cursor: pointer;
-}
-EOF
-
-cat > script.js <<'EOF'
-function showMessage() {
-  alert('Static site is working!');
-}
+```
 EOF
 ```
 
